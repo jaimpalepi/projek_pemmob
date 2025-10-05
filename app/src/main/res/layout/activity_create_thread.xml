@@ -1,0 +1,167 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="#212121"
+    tools:context=".CreateThreadActivity">
+
+    <!-- Toolbar Kustom di Bagian Atas -->
+    <com.google.android.material.appbar.MaterialToolbar
+        android:id="@+id/toolbar"
+        android:layout_width="0dp"
+        android:layout_height="?attr/actionBarSize"
+        android:background="#212121"
+        app:contentInsetStart="0dp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent">
+
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:paddingStart="4dp"
+            android:paddingEnd="16dp">
+
+            <!-- Tombol Close -->
+            <ImageView
+                android:id="@+id/button_close"
+                android:layout_width="wrap_content"
+                android:layout_height="match_parent"
+                android:layout_alignParentStart="true"
+                android:contentDescription="Close"
+                android:padding="12dp"
+                android:src="@drawable/ic_close"
+                app:tint="@android:color/white" />
+
+            <!-- Judul Toolbar -->
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_centerVertical="true"
+                android:layout_toEndOf="@id/button_close"
+                android:text="Start A Thread"
+                android:textColor="@android:color/white"
+                android:textSize="20sp"
+                android:textStyle="bold" />
+
+            <!-- Tombol Post -->
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/button_post"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentEnd="true"
+                android:layout_centerVertical="true"
+                android:backgroundTint="#424242"
+                android:text="Post"
+                android:textAllCaps="false"
+                android:textColor="@android:color/white"
+                app:cornerRadius="20dp" />
+        </RelativeLayout>
+
+    </com.google.android.material.appbar.MaterialToolbar>
+
+    <!-- Konten Scrollable -->
+    <ScrollView
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/toolbar">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:padding="16dp">
+
+            <!-- Input Alias -->
+            <EditText
+                android:id="@+id/input_alias"
+                android:layout_width="match_parent"
+                android:layout_height="56dp"
+                android:background="@drawable/edittext_background"
+                android:hint="Alias (optional)"
+                android:inputType="text"
+                android:padding="16dp"
+                android:textColor="@android:color/white"
+                android:textColorHint="#9E9E9E"
+                android:textSize="16sp" />
+
+            <!-- Input Judul -->
+            <EditText
+                android:id="@+id/input_title"
+                android:layout_width="match_parent"
+                android:layout_height="56dp"
+                android:layout_marginTop="16dp"
+                android:background="@drawable/edittext_background"
+                android:hint="Title*"
+                android:inputType="textCapSentences"
+                android:padding="16dp"
+                android:textColor="@android:color/white"
+                android:textColorHint="#9E9E9E"
+                android:textSize="16sp" />
+
+            <!-- Tombol Pilih Nook -->
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/button_pick_nook"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="24dp"
+                android:backgroundTint="#424242"
+                android:text="Pick a Nook ::"
+                android:textAllCaps="false"
+                android:textColor="@android:color/white"
+                app:cornerRadius="8dp" />
+
+            <!-- Area Lampirkan Gambar -->
+            <LinearLayout
+                android:id="@+id/layout_attach_image"
+                android:layout_width="match_parent"
+                android:layout_height="180dp"
+                android:layout_marginTop="24dp"
+                android:background="@drawable/dotted_border_background"
+                android:clickable="true"
+                android:focusable="true"
+                android:gravity="center"
+                android:orientation="vertical">
+
+                <ImageView
+                    android:layout_width="40dp"
+                    android:layout_height="40dp"
+                    android:src="@drawable/ic_attach_image"
+                    app:tint="#9E9E9E" />
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="8dp"
+                    android:text="Attach Image"
+                    android:textColor="#9E9E9E"
+                    android:textSize="14sp" />
+
+            </LinearLayout>
+
+            <!-- Input Body Text -->
+            <EditText
+                android:id="@+id/input_body"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="24dp"
+                android:background="@drawable/edittext_background"
+                android:gravity="top"
+                android:hint="Body Text"
+                android:inputType="textMultiLine"
+                android:minHeight="150dp"
+                android:padding="16dp"
+                android:textColor="@android:color/white"
+                android:textColorHint="#9E9E9E"
+                android:textSize="16sp" />
+
+        </LinearLayout>
+
+    </ScrollView>
+
+</androidx.constraintlayout.widget.ConstraintLayout>

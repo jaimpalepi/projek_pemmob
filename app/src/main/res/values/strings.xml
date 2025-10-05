@@ -1,0 +1,9 @@
+<resources>
+    <string name="app_name">Fesnuk</string>
+    <string name="SubNook">UmaMusume</string>
+    <string name="time">51 min Ago</string>
+    <string name="title">POST TITLE HERE</string>
+    <string name="caption">Who is up cranking their blitz rn?</string>
+    <!-- TODO: Remove or change this placeholder text -->
+    <string name="hello_blank_fragment">Hello blank fragment</string>
+</resources>
