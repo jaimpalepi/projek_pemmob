@@ -34,6 +34,9 @@ fun AppNavigation(
                 onPostClick = { postId ->
                     navController.navigate(NavigationRoutes.PostDetail.createRoute(postId.toString()))
                 },
+                onNookClick = { nookId ->
+                    navController.navigate(NavigationRoutes.NookDetail.createRoute(nookId))
+                },
                 repository = repository,
                 shouldRefresh = shouldRefreshHome,
                 onRefreshHandled = { shouldRefreshHome = false }

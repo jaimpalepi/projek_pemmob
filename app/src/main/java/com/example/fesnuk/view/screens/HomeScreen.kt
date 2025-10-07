@@ -23,6 +23,7 @@ import com.example.fesnuk.data.NookRepository
 @Composable
 fun HomeScreen(
     onPostClick: (Int) -> Unit = {},
+    onNookClick: (String) -> Unit = {},
     repository: NookRepository,
     viewModel: HomeViewModel = viewModel { HomeViewModel(repository) },
     shouldRefresh: Boolean = false,
@@ -102,6 +103,7 @@ fun HomeScreen(
                             PostCard(
                                 post = post,
                                 onPostClick = { onPostClick(post.id) },
+                                onNookClick = { onNookClick(post.nookId) },
                                 onPostUpdated = { viewModel.refreshPosts() }
                             )
                         }
