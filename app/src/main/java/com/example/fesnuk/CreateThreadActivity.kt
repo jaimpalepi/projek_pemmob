@@ -1,20 +1,21 @@
 package com.example.fesnuk
 
 import android.os.Bundle
-import androidx.activity.enableEdgeToEdge
-import androidx.appcompat.app.AppCompatActivity
-import androidx.core.view.ViewCompat
-import androidx.core.view.WindowInsetsCompat
+import androidx.activity.ComponentActivity
+import androidx.activity.compose.setContent
+import com.example.fesnuk.view.theme.FesnukTheme
+import com.example.fesnuk.view.screens.CreateThreadScreen
 
-class CreateThreadActivity : AppCompatActivity() {
+class CreateThreadActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        enableEdgeToEdge()
-        setContentView(R.layout.activity_create_thread)
-        ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.main)) { v, insets ->
-            val systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars())
-            v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom)
-            insets
+        setContent {
+            FesnukTheme {
+                CreateThreadScreen(
+                    onCloseClick = { finish() },
+                    context = this@CreateThreadActivity
+                )
+            }
         }
     }
 }
