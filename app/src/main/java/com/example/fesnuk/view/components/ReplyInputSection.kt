@@ -21,8 +21,8 @@ import com.example.fesnuk.view.theme.*
 
 @Composable
 fun ReplyInputSection(
-    replyingToCommentId: Int,
-    onReplySubmit: (String, Int) -> Unit,
+    replyingToCommentId: Int?,
+    onSubmit: (String, Int?) -> Unit,
     onCancelReply: () -> Unit,
     isLoading: Boolean = false
 ) {
@@ -42,33 +42,34 @@ fun ReplyInputSection(
                 .fillMaxWidth()
                 .padding(16.dp)
         ) {
-            // Reply header
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.SpaceBetween,
-                verticalAlignment = Alignment.CenterVertically
-            ) {
-                Text(
-                    text = "Replying to comment",
-                    color = TextSecondary,
-                    style = MaterialTheme.typography.bodySmall,
-                    fontWeight = FontWeight.Medium
-                )
-                
-                IconButton(
-                    onClick = onCancelReply,
-                    modifier = Modifier.size(24.dp)
+            // Reply header (shown only when replying)
+            if (replyingToCommentId != null) {
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.SpaceBetween,
+                    verticalAlignment = Alignment.CenterVertically
                 ) {
-                    Icon(
-                        imageVector = Icons.Default.Close,
-                        contentDescription = "Cancel reply",
-                        tint = TextSecondary,
-                        modifier = Modifier.size(16.dp)
+                    Text(
+                        text = "Replying to comment",
+                        color = TextSecondary,
+                        style = MaterialTheme.typography.bodySmall,
+                        fontWeight = FontWeight.Medium
                     )
+                    
+                    IconButton(
+                        onClick = onCancelReply,
+                        modifier = Modifier.size(24.dp)
+                    ) {
+                        Icon(
+                            imageVector = Icons.Default.Close,
+                            contentDescription = "Cancel reply",
+                            tint = TextSecondary,
+                            modifier = Modifier.size(16.dp)
+                        )
+                    }
                 }
+                Spacer(modifier = Modifier.height(8.dp))
             }
-            
-            Spacer(modifier = Modifier.height(8.dp))
             
             // Reply input
             Row(
@@ -80,7 +81,7 @@ fun ReplyInputSection(
                     onValueChange = { replyText = it },
                     placeholder = {
                         Text(
-                            text = "Write a reply...",
+                            text = "Write a comment...",
                             color = TextTertiary
                         )
                     },
@@ -99,7 +100,7 @@ fun ReplyInputSection(
                     keyboardActions = KeyboardActions(
                         onSend = {
                             if (replyText.isNotBlank() && !isLoading) {
-                                onReplySubmit(replyText.trim(), replyingToCommentId)
+                                onSubmit(replyText.trim(), replyingToCommentId)
                                 replyText = ""
                             }
                         }
@@ -110,7 +111,7 @@ fun ReplyInputSection(
                 IconButton(
                     onClick = {
                         if (replyText.isNotBlank() && !isLoading) {
-                            onReplySubmit(replyText.trim(), replyingToCommentId)
+                            onSubmit(replyText.trim(), replyingToCommentId)
                             replyText = ""
                         }
                     },
@@ -131,7 +132,7 @@ fun ReplyInputSection(
                     } else {
                         Icon(
                             imageVector = Icons.Default.Send,
-                            contentDescription = "Send reply",
+                            contentDescription = "Send comment",
                             tint = Color.White,
                             modifier = Modifier.size(20.dp)
                         )
