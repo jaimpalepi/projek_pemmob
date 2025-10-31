@@ -23,7 +23,9 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.ImeAction
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.fesnuk.data.ThreadRepository
 import com.example.fesnuk.data.CommentRepository
@@ -36,6 +38,8 @@ import com.example.fesnuk.view.components.ReplyInputSection
 import com.example.fesnuk.view.theme.*
 import com.example.fesnuk.viewmodel.ThreadViewModel
 import com.example.fesnuk.viewmodel.ThreadViewModelFactory
+import com.google.accompanist.swiperefresh.SwipeRefresh
+import com.google.accompanist.swiperefresh.rememberSwipeRefreshState
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -48,6 +52,7 @@ fun ThreadScreen(
     viewModel: ThreadViewModel = viewModel(factory = ThreadViewModelFactory(ThreadRepository(), CommentRepository(RetrofitClient.apiService)))
 ) {
     val uiState by viewModel.uiState.collectAsState()
+    val swipeRefreshState = rememberSwipeRefreshState(isRefreshing = uiState.isLoading)
     
     LaunchedEffect(postId) {
         viewModel.loadPost(postId)
@@ -79,176 +84,176 @@ fun ThreadScreen(
                     verticalAlignment = Alignment.CenterVertically
                 ) {
                     // Online info
-                    Row(
-                        verticalAlignment = Alignment.CenterVertically,
-                        modifier = Modifier.padding(end = 16.dp)
-                    ) {
-                        Box(
-                            modifier = Modifier
-                                .size(8.dp)
-                                .background(OnlineGreen, CircleShape)
-                        )
-                        Spacer(modifier = Modifier.width(8.dp))
-                        Text(
-                            text = onlineCount,
-                            color = TextSecondary,
-                            style = MaterialTheme.typography.bodyMedium
-                        )
-                        Text(
-                            text = "|",
-                            color = Color(0xFF555555),
-                            style = MaterialTheme.typography.bodyMedium,
-                            modifier = Modifier.padding(horizontal = 8.dp)
-                        )
-                        Text(
-                            text = postCount,
-                            color = TextSecondary,
-                            style = MaterialTheme.typography.bodyMedium
-                        )
-                    }
-
-                    // Action buttons
-                    IconButton(onClick = { /* Search */ }) {
-                        Icon(
-                            imageVector = Icons.Default.Search,
-                            contentDescription = "Search",
-                            tint = TextPrimary
-                        )
-                    }
-                    IconButton(onClick = { /* Filter */ }) {
-                        Icon(
-                            imageVector = Icons.Default.FilterList,
-                            contentDescription = "Filter",
-                            tint = TextPrimary
-                        )
-                    }
-                    IconButton(onClick = { /* More */ }) {
-                        Icon(
-                            imageVector = Icons.Default.MoreVert,
-                            contentDescription = "More",
-                            tint = TextPrimary
-                        )
-                    }
+//                    Row(
+//                        verticalAlignment = Alignment.CenterVertically,
+//                        modifier = Modifier
+//                            .background(
+//                                Color.Green.copy(alpha = 0.2f),
+//                                RoundedCornerShape(12.dp)
+//                            )
+//                            .padding(horizontal = 8.dp, vertical = 4.dp)
+//                    ) {
+//                        Box(
+//                            modifier = Modifier
+//                                .size(8.dp)
+//                                .background(Color.Green, CircleShape)
+//                        )
+//                        Spacer(modifier = Modifier.width(4.dp))
+//                        Text(
+//                            text = onlineCount,
+//                            color = Color.Green,
+//                            fontSize = 12.sp
+//                        )
+//                    }
+//
+//                    Spacer(modifier = Modifier.width(8.dp))
+//
+//                    // Post count
+//                    Text(
+//                        text = postCount,
+//                        color = TextSecondary,
+//                        fontSize = 12.sp
+//                    )
                 }
             },
             colors = TopAppBarDefaults.topAppBarColors(
-                containerColor = Color(0xFF2C2C2C)
+                containerColor = Color.Transparent
             )
         )
-
-        // Thread content
-        LazyColumn(
-            modifier = Modifier.fillMaxSize(),
-            contentPadding = PaddingValues(8.dp),
-            verticalArrangement = Arrangement.spacedBy(0.dp)
+        
+        // Main content with SwipeRefresh
+        SwipeRefresh(
+            state = swipeRefreshState,
+            onRefresh = { viewModel.refreshPost(postId) },
+            modifier = Modifier.weight(1f)
         ) {
-            when {
-                uiState.isLoading -> {
-                    item {
+            Box(
+                modifier = Modifier.fillMaxSize()
+            ) {
+                when {
+                    uiState.isLoading && uiState.post == null -> {
+                        // Initial loading state
                         Box(
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .padding(32.dp),
+                            modifier = Modifier.fillMaxSize(),
                             contentAlignment = Alignment.Center
                         ) {
-                            CircularProgressIndicator(
-                                color = Color(0xFF4CAF50)
-                            )
+                            CircularProgressIndicator(color = Color.White)
                         }
                     }
-                }
-                uiState.errorMessage != null -> {
-                    item {
-                        Card(
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .padding(16.dp),
-                            colors = CardDefaults.cardColors(
-                                containerColor = Color(0xFF2C2C2C)
-                            )
+                    
+                    uiState.errorMessage != null -> {
+                        // Error state
+                        Box(
+                            modifier = Modifier.fillMaxSize(),
+                            contentAlignment = Alignment.Center
                         ) {
-                            Text(
-                                text = "Error: ${uiState.errorMessage}",
-                                color = Color(0xFFFF6B6B),
-                                modifier = Modifier.padding(16.dp)
-                            )
-                        }
-                    }
-                }
-                uiState.post != null -> {
-                    // Original post
-                    item {
-                        uiState.post?.let { post ->
-                            PostCard(
-                                post = post,
-                                renderMode = PostRenderMode.FULL,
-                                onPostClick = { /* Already in thread view */ },
-                                onNookClick = onNookClick
-                            )
-                        }
-                    }
-                    
-                    // Comment input section
-                    item {
-                        CommentInputSection(
-                            onCommentSubmit = { content ->
-                                 viewModel.postComment(postId.toInt(), content)
-                             },
-                            isLoading = uiState.isPostingComment
-                        )
-                    }
-                    
-                    // Reply input section (shown when replying)
-                    uiState.replyingToCommentId?.let { replyingToId ->
-                        item {
-                            ReplyInputSection(
-                                replyingToCommentId = replyingToId,
-                                onReplySubmit = { content, parentId ->
-                                    viewModel.replyToComment(postId.toInt(), content, parentId)
-                                },
-                                onCancelReply = {
-                                    viewModel.cancelReply()
-                                },
-                                isLoading = uiState.isPostingComment
-                            )
-                        }
-                    }
-                    
-                    // Comments section
-                    if (uiState.isLoadingComments) {
-                        item {
-                            Box(
-                                modifier = Modifier
-                                    .fillMaxWidth()
-                                    .padding(16.dp),
-                                contentAlignment = Alignment.Center
+                            Column(
+                                horizontalAlignment = Alignment.CenterHorizontally
                             ) {
-                                CircularProgressIndicator(
-                                    color = Color(0xFF4CAF50)
+                                Text(
+                                    text = "Error: ${uiState.errorMessage}",
+                                    color = MaterialTheme.colorScheme.error,
+                                    textAlign = TextAlign.Center
                                 )
+                                Spacer(modifier = Modifier.height(16.dp))
+                                Button(
+                                    onClick = { viewModel.refreshPost(postId) }
+                                ) {
+                                    Text("Retry")
+                                }
                             }
                         }
-                    } else {
-                        items(uiState.comments) { comment ->
-                            CommentCard(
-                                comment = comment,
-                                isReply = false,
-                                onReplyClick = {
-                                    viewModel.startReplyToComment(comment.id)
-                                },
-                                onExpandClick = {
-                                    viewModel.toggleCommentExpansion(comment.id)
-                                },
-                                isExpanded = uiState.expandedComments.contains(comment.id)
-                            )
+                    }
+                    
+                    uiState.post != null -> {
+                        // Content loaded
+                        LazyColumn(
+                            modifier = Modifier
+                                .fillMaxSize()
+                                .padding(bottom = 80.dp), // Space for floating input
+                            verticalArrangement = Arrangement.spacedBy(0.dp)
+                        ) {
+                            // Main post
+                            item {
+                                PostCard(
+                                    post = uiState.post!!,
+                                    renderMode = PostRenderMode.FULL,
+                                    onPostClick = { /* Already in detail view */ },
+                                    onNookClick = { /* Navigate to nook */ },
+                                    onReplyClick = { /* Show comment input */ },
+                                    onShareClick = { /* Share post */ },
+                                    onMoreOptionsClick = { /* Show options */ }
+                                )
+                            }
                             
-                            // Show replies if expanded
-                            if (uiState.expandedComments.contains(comment.id)) {
-                                uiState.commentReplies[comment.id]?.let { replies ->
-                                    replies.forEach { reply ->
-                                        CommentCard(
-                                            comment = reply,
-                                            isReply = true
+                            // Comments header
+                            if (uiState.comments.isNotEmpty()) {
+                                item {
+                                    Text(
+                                        text = "Comments",
+                                        color = TextPrimary,
+                                        fontSize = 18.sp,
+                                        fontWeight = FontWeight.Bold,
+                                        modifier = Modifier.padding(16.dp)
+                                    )
+                                }
+                            }
+                            
+                            // Comments loading state
+                            if (uiState.isLoadingComments) {
+                                item {
+                                    Box(
+                                        modifier = Modifier
+                                            .fillMaxWidth()
+                                            .padding(16.dp),
+                                        contentAlignment = Alignment.Center
+                                    ) {
+                                        CircularProgressIndicator(
+                            color = Color.White,
+                            modifier = Modifier.size(24.dp)
+                        )
+                                    }
+                                }
+                            }
+                            
+                            // Comments
+                            items(uiState.comments) { comment ->
+                                CommentCard(
+                                    comment = comment,
+                                    isReply = false,
+                                    onReplyClick = { viewModel.startReplyToComment(comment.id) },
+                                    onExpandClick = { viewModel.toggleCommentExpansion(comment.id) },
+                                    isExpanded = uiState.expandedComments.contains(comment.id)
+                                )
+                                
+                                // Show replies if expanded
+                                if (uiState.expandedComments.contains(comment.id)) {
+                                    uiState.commentReplies[comment.id]?.let { replies ->
+                                        replies.forEach { reply ->
+                                            CommentCard(
+                                                comment = reply,
+                                                isReply = true
+                                            )
+                                        }
+                                    }
+                                }
+                            }
+                            
+                            // Empty comments state
+                            if (uiState.comments.isEmpty() && !uiState.isLoadingComments) {
+                                item {
+                                    Box(
+                                        modifier = Modifier
+                                            .fillMaxWidth()
+                                            .padding(32.dp),
+                                        contentAlignment = Alignment.Center
+                                    ) {
+                                        Text(
+                                            text = "No comments yet",
+                                            color = TextSecondary,
+                                            fontSize = 16.sp,
+                                            textAlign = TextAlign.Center,
+                                            modifier = Modifier.fillMaxWidth()
                                         )
                                     }
                                 }
@@ -256,92 +261,35 @@ fun ThreadScreen(
                         }
                     }
                 }
-            }
-        }
-    }
-}
-
-@Composable
-fun CommentInputSection(
-    onCommentSubmit: (String) -> Unit,
-    isLoading: Boolean = false
-) {
-    var commentText by remember { mutableStateOf("") }
-    
-    Card(
-        modifier = Modifier
-            .fillMaxWidth()
-            .padding(8.dp),
-        colors = CardDefaults.cardColors(
-            containerColor = Color(0xFF2C2C2C)
-        ),
-        shape = RoundedCornerShape(12.dp)
-    ) {
-        Row(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(16.dp),
-            verticalAlignment = Alignment.CenterVertically
-        ) {
-            OutlinedTextField(
-                value = commentText,
-                onValueChange = { commentText = it },
-                placeholder = {
-                    Text(
-                        text = "Write a comment...",
-                        color = TextSecondary
-                    )
-                },
-                modifier = Modifier.weight(1f),
-                colors = OutlinedTextFieldDefaults.colors(
-                    focusedTextColor = TextPrimary,
-                    unfocusedTextColor = TextPrimary,
-                    focusedBorderColor = Color(0xFF4CAF50),
-                    unfocusedBorderColor = Color(0xFF555555),
-                    cursorColor = Color(0xFF4CAF50)
-                ),
-                keyboardOptions = KeyboardOptions(
-                    imeAction = ImeAction.Send
-                ),
-                keyboardActions = KeyboardActions(
-                    onSend = {
-                        if (commentText.isNotBlank() && !isLoading) {
-                            onCommentSubmit(commentText)
-                            commentText = ""
-                        }
+                
+                // Floating comment input at bottom
+                if (uiState.post != null) {
+                    Box(
+                        modifier = Modifier
+                            .align(Alignment.BottomCenter)
+                            .navigationBarsPadding()
+                            .imePadding()
+                    ) {
+                        ReplyInputSection(
+                            replyingToCommentId = uiState.replyingToCommentId,
+                            onSubmit = { content, commentId ->
+                                if (commentId != null) {
+                                    viewModel.replyToComment(uiState.post!!.id, content, commentId)
+                                } else {
+                                    viewModel.postComment(uiState.post!!.id, content)
+                                }
+                            },
+                            onCancelReply = { viewModel.cancelReply() },
+                            isLoading = uiState.isPostingComment
+                        )
                     }
-                ),
-                enabled = !isLoading
-            )
-            
-            Spacer(modifier = Modifier.width(8.dp))
-            
-            IconButton(
-                onClick = {
-                    if (commentText.isNotBlank() && !isLoading) {
-                        onCommentSubmit(commentText)
-                        commentText = ""
-                    }
-                },
-                enabled = commentText.isNotBlank() && !isLoading
-            ) {
-                if (isLoading) {
-                    CircularProgressIndicator(
-                        modifier = Modifier.size(20.dp),
-                        color = Color(0xFF4CAF50),
-                        strokeWidth = 2.dp
-                    )
-                } else {
-                    Icon(
-                        imageVector = Icons.Default.Send,
-                        contentDescription = "Send comment",
-                        tint = if (commentText.isNotBlank()) Color(0xFF4CAF50) else TextSecondary
-                    )
                 }
             }
         }
     }
 }
+
+ 
 
 data class ReplyData(
     val replyingTo: String,
