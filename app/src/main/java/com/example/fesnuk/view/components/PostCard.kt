@@ -230,29 +230,33 @@ fun PostCard(
                 PostRenderMode.PREVIEW -> {
                     if (post.attachments.isEmpty()) {
                         // Show limited content when no attachments in preview mode
-                        Spacer(modifier = Modifier.height(8.dp))
-                        Text(
-                            text = if (post.content.length > 255) {
-                                "${post.content.take(255)}..."
-                            } else {
-                                post.content
-                            },
-                            color = TextPrimary,
-                            style = MaterialTheme.typography.bodyMedium,
-                            maxLines = 3,
-                            overflow = TextOverflow.Ellipsis
-                        )
+                        post.content?.takeIf { it.isNotBlank() }?.let { content ->
+                            Spacer(modifier = Modifier.height(8.dp))
+                            Text(
+                                text = if (content.length > 255) {
+                                    "${content.take(255)}..."
+                                } else {
+                                    content
+                                },
+                                color = TextPrimary,
+                                style = MaterialTheme.typography.bodyMedium,
+                                maxLines = 3,
+                                overflow = TextOverflow.Ellipsis
+                            )
+                        }
                     }
                     // If there are attachments, don't show content in preview mode
                 }
                 PostRenderMode.FULL -> {
-                    // Show full content in full mode
-                    Spacer(modifier = Modifier.height(8.dp))
-                    Text(
-                        text = post.content,
-                        color = TextPrimary,
-                        style = MaterialTheme.typography.bodyMedium
-                    )
+                    // Show full content in full mode, only if present
+                    post.content?.takeIf { it.isNotBlank() }?.let { content ->
+                        Spacer(modifier = Modifier.height(8.dp))
+                        Text(
+                            text = content,
+                            color = TextPrimary,
+                            style = MaterialTheme.typography.bodyMedium
+                        )
+                    }
                 }
             }
 

@@ -39,7 +39,7 @@ data class CreatePostRequest(
     @SerializedName("title")
     val title: String,
     @SerializedName("content")
-    val content: String,
+    val content: String?,
     @SerializedName("nook_id")
     val nookId: String,
     @SerializedName("attachments")
@@ -52,7 +52,7 @@ data class PostApiData(
     @SerializedName("title")
     val title: String,
     @SerializedName("content")
-    val content: String,
+    val content: String?,
     @SerializedName("nook_id")
     val nookId: String,
     @SerializedName("nook_name")
