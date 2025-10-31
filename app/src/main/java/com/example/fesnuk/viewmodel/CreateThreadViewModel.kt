@@ -134,8 +134,11 @@ class CreateThreadViewModel(private val context: Context) : ViewModel() {
             return
         }
         
-        if (currentState.content.isBlank()) {
-            _uiState.value = currentState.copy(errorMessage = "Please enter content")
+        // Validate at least one of content or images is provided
+        if (currentState.content.isBlank() && currentState.selectedImages.isEmpty()) {
+            _uiState.value = currentState.copy(
+                errorMessage = "Please enter content or attach at least one image"
+            )
             return
         }
 
@@ -206,7 +209,7 @@ class CreateThreadViewModel(private val context: Context) : ViewModel() {
                 // Create the post
                 repository.createPost(
                     title = currentState.title,
-                    content = currentState.content,
+                    content = currentState.content.ifBlank { null },
                     nookId = currentState.selectedNook?.id ?: "",
                     attachments = attachments
                 ).onSuccess { postId ->

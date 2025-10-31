@@ -136,7 +136,7 @@ class NookRepository {
 
     suspend fun createPost(
         title: String,
-        content: String,
+        content: String?,
         nookId: String,
         attachments: List<Attachment>
     ): Result<String> {
