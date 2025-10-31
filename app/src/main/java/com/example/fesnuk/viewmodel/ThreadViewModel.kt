@@ -188,6 +188,12 @@ class ThreadViewModel(
     }
     
     fun refreshPost(postId: String) {
+        // Clear any existing error states
+        _uiState.value = _uiState.value.copy(
+            errorMessage = null,
+            commentErrorMessage = null
+        )
+        // Reload post and comments
         loadPost(postId)
     }
 }
